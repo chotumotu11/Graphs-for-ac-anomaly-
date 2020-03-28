@@ -10,10 +10,16 @@ class MinMaxChartCustom extends React.PureComponent {
     render() {
         const amin = this.props.min;
         const amax = this.props.max;
-        const conn = [...amin,...amax,100];
         const min = this.props.min.map((value) => ({ value }))
         const max = this.props.max.map((value) => ({ value }))
         const weeknum = Math.floor(this.props.date.format("DD") / 7); 
+        let conn;
+        if(this.props.numtype == 0){
+            conn = [...amin,...amax,40];
+        }else{
+            conn = [...amin,...amax,100];
+        }
+
 
         const data1 = ['SUN','MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'].map((value) => ({ value }))
         const barData = [
@@ -61,7 +67,7 @@ class MinMaxChartCustom extends React.PureComponent {
                 />
                 <BarChart
                     style={ { flex: 1 } }
-                    yMax={100}
+                    yMax={this.props.numtype == 0 ? 40 : 100}
                     data={ barData }
                     numberOfTicks = {10}
                     yAccessor={({ item }) => item.value}

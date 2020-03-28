@@ -185,8 +185,8 @@ class DataScrollerWeek extends React.PureComponent {
                             <Button title="Pevious week" onPress={() => {this.onLeftButtonClick()}}/>
                             <Button title="Next week" onPress={() => {this.onRightButtonClick()}}/>
                         </View>
-                        <MinMaxChartCustom max={weektempmax} min={weektempmin} date={date} type={"Room Temperature"}></MinMaxChartCustom>
-                        <MinMaxChartCustom max={weekhumimax} min={weekhumimin} date={date} type={"Room Humidity"}></MinMaxChartCustom>
+                        <MinMaxChartCustom max={weektempmax} min={weektempmin} date={date} type={"Room Temperature"} numtype={0}></MinMaxChartCustom>
+                        <MinMaxChartCustom max={weekhumimax} min={weekhumimin} date={date} type={"Room Humidity"} numtype={1}></MinMaxChartCustom>
                         <BarChartComp data={weekpowersum} type={"Total power per day "} numtype={3} weekly={true} date={moment.utc(this.state.date).endOf('week')} ></BarChartComp>
                 </ScrollView>
             </View>

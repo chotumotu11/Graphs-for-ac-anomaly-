@@ -16,8 +16,10 @@ class BarChartComp extends React.PureComponent {
             data1 = [0,...data,datamax+20000];
         }else if(this.props.numtype == 2){
             data1 = [0,...data,datamax+500];
+        }else if(this.props.numtype == 0){
+            data1 = [0,...data,40];
         }else{
-            data1 = [0,...data,datamax+30];
+            data1 = [0,...data,100];
         }
 
         let xa = [];
@@ -39,24 +41,24 @@ class BarChartComp extends React.PureComponent {
                         yAccessor={({ item }) => item}
                         contentInset={{ top: 10, bottom: 10 }}
                         numberOfTicks={10}
-                        formatLabel={ (value, index) => value }
+                        formatLabel={ (value, index) => value>10000 ? (value/1000)+"K" : value }
                         labelStyle={ { color: 'black' } }
                         svg={{ fontSize: 12, fill: 'black' }}
                     />
                     <BarChart
                         style= {{flex: 1}}
-                        yMax = {this.props.numtype == 2 ? datamax+500 : (this.props.numtype == 3 ? datamax+20000 : datamax+30)}
+                        yMax = {this.props.numtype == 2 ? datamax+500 : (this.props.numtype == 3 ? datamax+20000 : (this.props.numtype == 0 ? 40 : 100))}
                         yMin = {0}
                         data={data}
                         yScale = {scale.scaleLinear}
-                        svg={{ fill: 'rgba(56, 226, 238, 0.8)' }}
+                        svg={{ fill: 'rgba(13, 152, 186, 0.8)' }}
                         contentInset={{ top: 10, bottom: 10 }}
                         yAccessor={({ item }) => item}
                         spacing={0.2}
                         numberOfTicks={10}
                         animationDuration = {2000}
                         animate= {true}
-                        spacingInner= {0.2}
+                        spacingInner= {0.1}
                     >
                         <Grid />
                     </BarChart>
@@ -67,7 +69,8 @@ class BarChartComp extends React.PureComponent {
                     scale={scale.scaleBand}
                     xAccessor={({ item }) => item}
                     labelStyle={ { color: 'black' } }
-                    spacingInner= {0.2}
+                    formatLabel={ (value, index) => Number.isInteger(value) ? (value%2==0 ? (value<10 ? "0"+value : value ) : "") : value}
+                    spacingInner= {0.1}
                     svg={{ fill: 'black'}}
                 />
         
