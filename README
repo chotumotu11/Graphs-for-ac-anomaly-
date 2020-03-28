@@ -1,0 +1,6 @@
+This is the code for Smart Building app. This is an ongoing project.This has been developed by Dipayan Deb.
+To install clone and do npm install
+The do 
+npx react-native run-android
+You might face errors while installng. Try updating node version etc etc. Check your configuration. Some libraries need
+to be manually linked.
