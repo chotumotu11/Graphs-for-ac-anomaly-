@@ -12,8 +12,10 @@ class BarChartComp extends React.PureComponent {
         let data1 = [];
         let datamax = Math.max(...data);
         const weeknum = Math.floor(this.props.date.format("DD") / 7); 
+        let startdate = moment.utc(this.props.date).startOf('week');
+        let enddate = moment.utc(this.props.date).endOf('week');
         if(this.props.numtype == 3){
-            data1 = [0,...data,datamax+20000];
+            data1 = [0,...data,datamax+500000];
         }else if(this.props.numtype == 2){
             data1 = [0,...data,datamax+500];
         }else if(this.props.numtype == 0){
@@ -26,7 +28,7 @@ class BarChartComp extends React.PureComponent {
         let dayinfo =  <Text>{this.props.type} Data for Day {this.props.date.format('DD/MM/YYYY')}</Text>;
         if(this.props.weekly){
             xa = ['SUN','MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
-            dayinfo = <Text>Graph for {this.props.type}.Week :{weeknum} of {this.props.date.format("MM/YYYY")}</Text>;
+            dayinfo = <Text>Graph for {this.props.type}.Week from {startdate.format("DD/MM/YYYY")} to {enddate.format("DD/MM/YYYY")}</Text>;
         }else{
             xa = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23];
         }
@@ -47,7 +49,7 @@ class BarChartComp extends React.PureComponent {
                     />
                     <BarChart
                         style= {{flex: 1}}
-                        yMax = {this.props.numtype == 2 ? datamax+500 : (this.props.numtype == 3 ? datamax+20000 : (this.props.numtype == 0 ? 40 : 100))}
+                        yMax = {this.props.numtype == 2 ? datamax+500 : (this.props.numtype == 3 ? datamax+500000 : (this.props.numtype == 0 ? 40 : 100))}
                         yMin = {0}
                         data={data}
                         yScale = {scale.scaleLinear}

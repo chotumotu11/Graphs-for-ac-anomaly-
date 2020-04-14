@@ -40,6 +40,8 @@ target 'graphs' do
 
   pod 'RNFS', :path => '../node_modules/react-native-fs'
 
+  pod 'RCTRestart', :path => '../node_modules/react-native-restart'
+
   target 'graphsTests' do
     inherit! :search_paths
     # Pods for testing

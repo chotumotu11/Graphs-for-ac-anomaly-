@@ -12,12 +12,16 @@ class MinMaxChartCustom extends React.PureComponent {
         const amax = this.props.max;
         const min = this.props.min.map((value) => ({ value }))
         const max = this.props.max.map((value) => ({ value }))
-        const weeknum = Math.floor(this.props.date.format("DD") / 7); 
+        const weeknum = Math.ceil(this.props.date.format("DD") / 7); 
+        console.log("Date Received "+this.props.date.format("DDMMYYYY"));
+        console.log("Weeknum "+weeknum);
         let conn;
+        let startdate = moment.utc(this.props.date).startOf('week');
+        let enddate = moment.utc(this.props.date).endOf('week');
         if(this.props.numtype == 0){
-            conn = [...amin,...amax,40];
+            conn = [0,...amin,...amax,40];
         }else{
-            conn = [...amin,...amax,100];
+            conn = [0,...amin,...amax,100];
         }
 
 
@@ -53,7 +57,7 @@ class MinMaxChartCustom extends React.PureComponent {
 
         return (
           <View  style={{ flexDirection: 'column', height: 400, padding: 20 }}>
-            <Text>Graph for {this.props.type}.Week :{weeknum} of {this.props.date.format("MM/YYYY")}</Text>
+            <Text>Graph for {this.props.type}.Week from {startdate.format("DD/MM/YYYY")} to {enddate.format("DD/MM/YYYY")}</Text>
             <View style={{ flexDirection: 'row', height: 300}}>
                 <YAxis
                     style={{ width: 40}}
@@ -68,6 +72,7 @@ class MinMaxChartCustom extends React.PureComponent {
                 <BarChart
                     style={ { flex: 1 } }
                     yMax={this.props.numtype == 0 ? 40 : 100}
+                    yMin={0}
                     data={ barData }
                     numberOfTicks = {10}
                     yAccessor={({ item }) => item.value}
