@@ -53,7 +53,8 @@ class startapp extends React.PureComponent {
                     this.setState({loading: false});
                 }).catch(err=>{
                     console.log("Server crashed  "+err);
-                    RNRestart.Restart();
+                    //RNRestart.Restart();
+                    this.setState({loading: false});
                 });
 
     }

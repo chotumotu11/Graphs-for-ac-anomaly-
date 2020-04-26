@@ -49,8 +49,10 @@ class DataScrollerDaily extends React.PureComponent {
             powermapnum.set(i,0);
         }
         let i=0;
+        console.log("Buga "+tempmapvalue.get(23));
         while(i<items.length){
-            let hour = parseInt(moment.utc(items[i]["Time_Stamp"]).format("H"));
+            let hour = parseInt(moment.utc(items[i]["_created"]).format("H"));
+
             let temp = items[i]["room_temp"];
             let humidity = items[i]["Humidity"];
             let current = items[i]["Current"];
@@ -76,6 +78,7 @@ class DataScrollerDaily extends React.PureComponent {
 
             i++
         }
+
 
         for(let i=0;i<24;i++){
 
@@ -121,17 +124,19 @@ class DataScrollerDaily extends React.PureComponent {
         if(moment.utc(this.state.date).isSameOrAfter(latestweekstart) && moment.utc(this.state.date).isSameOrBefore(latestweekend)){
             console.log("Something 2");
             let DATE_RFC1128 = "ddd, DD MMM YYYY HH:mm:ss [GMT]";
-            let start = moment.utc(this.state.date).startOf('day');
-            let stop = moment.utc(this.state.date).endOf('date');
+            let start = moment.utc().startOf('day');
+            let stop = moment.utc()
             let uri = 'http://118.185.27.157:5000/energygrid1?max_results=30000&where=_created>="'+start.format(DATE_RFC1128)+'" and _created<="'+stop.format(DATE_RFC1128)+'"';
+            console.log("Daily data "+uri);
             fetch(uri).then(response => response.json())
                 .then(item => {
                     console.log("Something 1");
                     item = item["_items"];
+        
                     AsyncStorage.setItem(start.format("DMMYYYY"),JSON.stringify(item));
                     let startweek = start.startOf('week');
-                    let todaysdate = moment.utc().format("DMMYYYY")
-                    AsyncStorage.setItem(todaysdate,JSON.stringify(item));
+                    //let todaysdate = moment.utc().format("DMMYYYY")
+                    //AsyncStorage.setItem(todaysdate,JSON.stringify(item));
                     this.myupdater(item,this.state.date);
                 })
         }

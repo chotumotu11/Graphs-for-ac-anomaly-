@@ -46,7 +46,7 @@ class DataScrollerWeek extends React.PureComponent {
 
         let i=0;
         while(i<items.length){
-            let day = parseInt(moment.utc(items[i]["Time_Stamp"]).format("D"));
+            let day = parseInt(moment.utc(items[i]["_created"]).format("D"));
         
             let temp = items[i]["room_temp"];
             let humidity = items[i]["Humidity"];
@@ -260,11 +260,11 @@ class DataScrollerWeek extends React.PureComponent {
                             }
                             console.log("The length is "+items.length);
                             while(i<items.length){
-                                let key = parseInt(moment.utc(items[i]["Time_Stamp"]).format("D"));
+                                let key = parseInt(moment.utc(items[i]["_created"]).format("D"));
                                 mymap.set(key,[...mymap.get(key),items[i]]);
                                 i++;
                             }
-                            for(let j=1;j<=parseInt(moment.utc(items[items.length-1]["Time_Stamp"]).format("D"));j++){
+                            for(let j=1;j<=parseInt(moment.utc(items[items.length-1]["_created"]).format("D"));j++){
                                 www = AsyncStorage.setItem(j+startdate.format("MMYYYY"),JSON.stringify(mymap.get(j)));
                             }  
                             
