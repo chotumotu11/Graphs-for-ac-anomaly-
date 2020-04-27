@@ -168,6 +168,10 @@ class DataScrollerWeek extends React.PureComponent {
             let DATE_RFC1128 = "ddd, DD MMM YYYY HH:mm:ss [GMT]";
             let start = moment.utc(this.state.date).startOf('day');
             let stop = moment.utc(this.state.date).endOf('date');
+            let monthend = 0;
+            if(parseInt(latestweekstart.format("M"))!=parseInt(latestweekend.format("M"))){
+                monthend = 2;
+            }
             let uri = 'http://118.185.27.157:5000/energygrid1?max_results=30000&where=_created>="'+start.format(DATE_RFC1128)+'" and _created<="'+stop.format(DATE_RFC1128)+'"';
             fetch(uri).then(response => response.json())
                 .then(item => {
@@ -189,7 +193,7 @@ class DataScrollerWeek extends React.PureComponent {
                                 passdata = [...passdata,...JSON.parse(stores[i][1])];
                             }
                         } 
-                        this.myupdater([...passdata,...item],moment.utc(),0,[],0);
+                        this.myupdater([...passdata,...item],moment.utc(),monthend,[],0);
             
                     } );
                 })
@@ -199,14 +203,21 @@ class DataScrollerWeek extends React.PureComponent {
     componentDidMount(){
         this.setState({fetching: true});
         this.getData();
+        let monthend = 0;
         this.intervalid = setInterval(() => this.getData(),120000);
         let keyarr =[];
         let newend = moment.utc();
+        let endweek = moment.utc().endOf('week');
         let monthstart = moment.utc().startOf('week');
         console.log(monthstart);
         while(monthstart.isSameOrBefore(newend)){
             keyarr = [...keyarr,monthstart.format('DMMYYYY')];
             monthstart.add(1, 'days')
+        }
+
+        console.log("keyarr"+keyarr);
+        if(parseInt(monthstart.format("M"))!=parseInt(endweek.format("M"))){
+            monthend = 2;
         }
 
         AsyncStorage.multiGet(keyarr, (err, stores) => {
@@ -216,7 +227,7 @@ class DataScrollerWeek extends React.PureComponent {
                     passdata = [...passdata,...JSON.parse(stores[i][1])];
                 }
             } 
-            this.myupdater(passdata,newend,0);
+            this.myupdater(passdata,newend,monthend);
             
           });
     }
