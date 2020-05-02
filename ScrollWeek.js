@@ -47,6 +47,7 @@ class DataScrollerWeek extends React.PureComponent {
         let i=0;
         while(i<items.length){
             let day = parseInt(moment.utc(items[i]["_created"]).format("D"));
+            //console.log("My print "+day);
         
             let temp = items[i]["room_temp"];
             let humidity = items[i]["Humidity"];
@@ -79,7 +80,8 @@ class DataScrollerWeek extends React.PureComponent {
 
             i++
         }
-
+        //console.log("My first "+first);
+        //console.log("My last "+last);
 
         for(let i=first;i<=last;i++){
             min_temp =  [...min_temp, tempmapvaluemin.get(i)];
@@ -102,6 +104,7 @@ class DataScrollerWeek extends React.PureComponent {
         let max_humidity = [];
 
         let reel;
+        let ret;
         let first =  parseInt(moment.utc(newDate).startOf('week').format("D"));                       // parseInt(moment.utc(items[0]["Time_Stamp"]).format("D"));
         let last =   parseInt(moment.utc(newDate).endOf('week').format("D"));                       // parseInt(moment.utc(items[items.length-1]["Time_Stamp"]).format("D"));
         // This condition is satisfied when a person goes to previous month. Half the week is in past month half in new month.
@@ -126,7 +129,11 @@ class DataScrollerWeek extends React.PureComponent {
             }
         }
 
-        let ret = this.eventparser(first,last,items,sum_power,min_temp,min_humidity,max_temp,max_humidity);
+        if(monthswitch == 2 && firstload == 1){
+            ret = this.eventparser(first,last,myitems,sum_power,min_temp,min_humidity,max_temp,max_humidity);
+        }else{
+            ret = this.eventparser(first,last,items,sum_power,min_temp,min_humidity,max_temp,max_humidity);
+        }
 
         if(monthswitch == 2){
             let thestart = parseInt(moment.utc(newDate).endOf('week').startOf('month').format("D"));
@@ -139,14 +146,13 @@ class DataScrollerWeek extends React.PureComponent {
             ret["sump"] = [...ret["sump"],...thereel["sump"]];
 
         }
-
-
+        /*
         console.log("Min Humidity : "+ret["minh"]);
         console.log("Max Humidity : "+ret["maxh"]);
         console.log("Max Temperature : "+ret["maxt"]);
         console.log("Min Temperature : "+ret["mint"]);
         console.log("Sum power : "+ret["sump"]);
-
+        */
 
         this.setState({
             weektempmax: ret["maxt"],
@@ -160,11 +166,10 @@ class DataScrollerWeek extends React.PureComponent {
     }
 
     getData(){
-        console.log("Something 3");
         let latestweekstart = moment.utc().startOf('week');
         let latestweekend = moment.utc().endOf('week');
         if(moment.utc(this.state.date).isSameOrAfter(latestweekstart) && moment.utc(this.state.date).isSameOrBefore(latestweekend)){
-            console.log("Something 2");
+            
             let DATE_RFC1128 = "ddd, DD MMM YYYY HH:mm:ss [GMT]";
             let start = moment.utc(this.state.date).startOf('day');
             let stop = moment.utc(this.state.date).endOf('date');
@@ -175,7 +180,7 @@ class DataScrollerWeek extends React.PureComponent {
             let uri = 'http://118.185.27.157:5000/energygrid1?max_results=30000&where=_created>="'+start.format(DATE_RFC1128)+'" and _created<="'+stop.format(DATE_RFC1128)+'"';
             fetch(uri).then(response => response.json())
                 .then(item => {
-                    console.log("Something 1");
+                    
                     item = item["_items"];
                     AsyncStorage.setItem(start.format("DMMYYYY"),JSON.stringify(item));
                     let startweek = start.startOf('week');
@@ -185,7 +190,7 @@ class DataScrollerWeek extends React.PureComponent {
                         keyarr = [...keyarr,startweek.format('DMMYYYY')];
                         startweek.add(1, 'days')
                     }
-                    console.log("Updater running keys"+keyarr);
+                    
                     AsyncStorage.multiGet(keyarr, (err, stores) => {
                         let passdata = [];
                         for(let i=0;i<stores.length;i++){
@@ -201,64 +206,44 @@ class DataScrollerWeek extends React.PureComponent {
     }
 
     componentDidMount(){
+        let DATE_RFC1128 = "ddd, DD MMM YYYY HH:mm:ss [GMT]";
         this.setState({fetching: true});
-        this.getData();
+        //this.getData();
         let monthend = 0;
-        this.intervalid = setInterval(() => this.getData(),120000);
-        let keyarr =[];
+        let www;
+        //this.intervalid = setInterval(() => this.getData(),120000);
         let newend = moment.utc();
         let endweek = moment.utc().endOf('week');
         let monthstart = moment.utc().startOf('week');
-        console.log(monthstart);
-        while(monthstart.isSameOrBefore(newend)){
-            keyarr = [...keyarr,monthstart.format('DMMYYYY')];
-            monthstart.add(1, 'days')
-        }
-
-        console.log("keyarr"+keyarr);
+        //console.log(parseInt(monthstart.format("M")));
+        //console.log(parseInt(endweek.format("M")));
+        
         if(parseInt(monthstart.format("M"))!=parseInt(endweek.format("M"))){
             monthend = 2;
-        }
+            AsyncStorage.getItem(moment.utc(monthstart).endOf('month').format("DMMYYYY")).then((item)=>{
+                if(item !=null  || (parseInt(monthstart.format("M")) == parseInt(this.state.date.format("M")))){
+                   
+                    let keyarr =[];
+                    while(monthstart.isSameOrBefore(newend.endOf('week'))){
+                        keyarr = [...keyarr,monthstart.format('DMMYYYY')];
+                        monthstart.add(1, 'days')
+                    }
 
-        AsyncStorage.multiGet(keyarr, (err, stores) => {
-            let passdata = [];
-            for(let i=0;i<stores.length;i++){
-                if(stores[i][1]!=null){
-                    passdata = [...passdata,...JSON.parse(stores[i][1])];
-                }
-            } 
-            this.myupdater(passdata,newend,monthend);
+                    
             
-          });
-    }
+                    AsyncStorage.multiGet(keyarr, (err, stores) => {
+                        let passdata = [];
+                        for(let i=0;i<stores.length;i++){
+                            if(stores[i][1]!=null){
+                                passdata = [...passdata,...JSON.parse(stores[i][1])];
+                            }
+                        } 
+                        this.myupdater(passdata,newend.startOf('week'),monthend);
+                        
+                      });
 
-    componentWillUnmount(){
-        clearInterval(this.intervalid);
-    }
-
-    onLeftButtonClick(){
-        let DATE_RFC1128 = "ddd, DD MMM YYYY HH:mm:ss [GMT]";
-        let newDate = moment.utc(this.state.date).subtract(7,'days').endOf('week').format("YYYY-MM-DD");
-        let firstload = 0;
-        console.log("New Date when left button clicked "+newDate);
-        this.setState({fetching: true});
-        let monthswitch = 0;
-        let startdate = moment.utc(newDate).startOf('week');
-        let enddate = moment.utc(newDate).endOf('week');
-        console.log("StartDate "+startdate.format("DMMYYYY"));
-        let www;
-        console.log("End date "+enddate.format("DMMYYYY")); 
-        if(parseInt(startdate.format("M"))!=parseInt(moment.utc(this.state.date).format("M"))){
-            if(parseInt(startdate.format("M"))!=parseInt(enddate.format("M"))){
-                monthswitch = 1;
-            }
-            AsyncStorage.getItem(moment.utc(startdate).format("DMMYYYY")).then((item)=>{
-                if(item == null){
-                    firstload=1;
-                    console.log("Start of month "+startdate.format("DDMMYYYY"));
-                    console.log("End of month "+enddate.format("DDMMYYYY"));
-                    let uri = 'http://118.185.27.157:5000/energygrid1?max_results=30000&where=_created>="'+startdate.startOf('month').format(DATE_RFC1128)+'" and _created<="'+startdate.endOf('month').format(DATE_RFC1128)+'"';
-                    console.log(uri);
+                }else{
+                    let uri = 'http://118.185.27.157:5000/energygrid1?max_results=30000&where=_created>="'+monthstart.startOf('month').format(DATE_RFC1128)+'" and _created<="'+monthstart.endOf('month').format(DATE_RFC1128)+'"';
                     fetch(uri)
                     .then(response => response.json())
                         .then((items) => {
@@ -269,7 +254,111 @@ class DataScrollerWeek extends React.PureComponent {
                             for(let j=1;j<=31;j++){
                                 mymap.set(j,[]);
                             }
-                            console.log("The length is "+items.length);
+                            //console.log("The length is "+items.length);
+                            while(i<items.length){
+                                let key = parseInt(moment.utc(items[i]["_created"]).format("D"));
+                                mymap.set(key,[...mymap.get(key),items[i]]);
+                                i++;
+                            }
+                            for(let j=1;j<=parseInt(moment.utc(items[items.length-1]["_created"]).format("D"));j++){
+                                www = AsyncStorage.setItem(j+monthstart.format("MMYYYY"),JSON.stringify(mymap.get(j)));
+                            }  
+                
+                            
+                            www.then(res=>{
+                                let keyarr =[];
+
+                                while(monthstart.isSameOrBefore(newend.endOf('week'))){
+                                    keyarr = [...keyarr,monthstart.format('DMMYYYY')];
+                                    monthstart.add(1, 'days')
+                                }
+
+                                
+                        
+                                AsyncStorage.multiGet(keyarr, (err, stores) => {
+                                    let passdata = [];
+                                    for(let i=0;i<stores.length;i++){
+                                        if(stores[i][1]!=null){
+                                            passdata = [...passdata,...JSON.parse(stores[i][1])];
+                                        }
+                                    } 
+                                    this.myupdater(passdata,newend.startOf('week'),monthend,items,1);
+                            
+                                } );
+
+                            })
+        
+                            
+                        }).catch(err=>{
+                            console.log("Server crashed  "+err);
+                            //RNRestart.Restart();
+        
+                        });
+
+                }
+
+            });
+
+        }else{
+
+            let keyarr =[];
+            while(monthstart.isSameOrBefore(newend.endOf('week'))){
+                keyarr = [...keyarr,monthstart.format('DMMYYYY')];
+                monthstart.add(1, 'days')
+            }
+
+            AsyncStorage.multiGet(keyarr, (err, stores) => {
+                let passdata = [];
+                for(let i=0;i<stores.length;i++){
+                    if(stores[i][1]!=null){
+                        passdata = [...passdata,...JSON.parse(stores[i][1])];
+                    }
+                } 
+                this.myupdater(passdata,newend.startOf('week'),monthend);
+                
+            });
+        }
+    }
+
+    componentWillUnmount(){
+        clearInterval(this.intervalid);
+    }
+
+    onLeftButtonClick(){
+        let DATE_RFC1128 = "ddd, DD MMM YYYY HH:mm:ss [GMT]";
+        let newDate = moment.utc(this.state.date).subtract(7,'days').endOf('week').format("YYYY-MM-DD");
+        let firstload = 0;
+        //console.log("New Date when left button clicked "+newDate);
+        this.setState({fetching: true});
+        let monthswitch = 0;
+        let startdate = moment.utc(newDate).startOf('week');
+        let enddate = moment.utc(newDate).endOf('week');
+        //console.log("StartDate "+startdate.format("DMMYYYY"));
+        let www;
+        //console.log("End date "+enddate.format("DMMYYYY")); 
+        if(parseInt(startdate.format("M"))!=parseInt(moment.utc(this.state.date).format("M"))){
+            if(parseInt(startdate.format("M"))!=parseInt(enddate.format("M"))){
+                monthswitch = 1;
+            }
+            AsyncStorage.getItem(moment.utc(startdate).endOf('month').format("DMMYYYY")).then((item)=>{
+                if(item == null){
+                    
+                    firstload=1;
+                    //console.log("Start of month "+startdate.format("DDMMYYYY"));
+                    //console.log("End of month "+enddate.format("DDMMYYYY"));
+                    let uri = 'http://118.185.27.157:5000/energygrid1?max_results=30000&where=_created>="'+startdate.startOf('month').format(DATE_RFC1128)+'" and _created<="'+startdate.endOf('month').format(DATE_RFC1128)+'"';
+                    //console.log(uri);
+                    fetch(uri)
+                    .then(response => response.json())
+                        .then((items) => {
+                            items = items["_items"];
+                        
+                            let i =0;
+                            let mymap = new Map();
+                            for(let j=1;j<=31;j++){
+                                mymap.set(j,[]);
+                            }
+                            //console.log("The length is "+items.length);
                             while(i<items.length){
                                 let key = parseInt(moment.utc(items[i]["_created"]).format("D"));
                                 mymap.set(key,[...mymap.get(key),items[i]]);
@@ -358,14 +447,14 @@ class DataScrollerWeek extends React.PureComponent {
         if(moment.utc(newDate).isAfter(moment.utc())){
             newDate =  moment.utc().format("YYYY-MM-DD");
         }
-        console.log("New Date when right button clicked "+newDate);
+        //console.log("New Date when right button clicked "+newDate);
         this.setState({fetching: true});
         let monthswitch = 0;
         let dateforpassing = moment.utc(newDate).startOf('week');
         let startdate = moment.utc(newDate).startOf('week');
         let enddate = moment.utc(newDate).endOf('week');
-        console.log("StartDate "+startdate.format("DMMYYYY"));
-        console.log("End date "+enddate.format("DMMYYYY")); 
+        //console.log("StartDate "+startdate.format("DMMYYYY"));
+        //console.log("End date "+enddate.format("DMMYYYY")); 
         if(parseInt(startdate.format("M"))!=parseInt(enddate.format("M"))){
             monthswitch = 2;
         }

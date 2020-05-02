@@ -40,11 +40,11 @@ class DataScrollerMonth extends React.PureComponent {
         let humimapvaluemin = new Map();
         let powermapvaluesum = new Map();
 
-        first = parseInt(moment.utc(newDate).startOf('month').format("D"));
-        last = parseInt(moment.utc(newDate).endOf('month').format("D"))
+        let first = parseInt(moment.utc(newDate).startOf('month').format("D"));
+        let last = parseInt(moment.utc(newDate).endOf('month').format("D"))
 
-        console.log("First "+first);
-        console.log("Second "+last);
+        //console.log("First "+first);
+        //console.log("Second "+last);
         for(let i = first;i<=last;i++){
             tempmapvaluemax.set(i,0);
             tempmapvaluemin.set(i,0);
@@ -122,7 +122,7 @@ class DataScrollerMonth extends React.PureComponent {
         let keyarr =[];
         let newend = moment.utc();
         let monthstart = moment.utc().startOf('month');
-        console.log(monthstart);
+        //console.log(monthstart);
         while(monthstart.isSameOrBefore(newend)){
             keyarr = [...keyarr,monthstart.format('DMMYYYY')];
             monthstart.add(1, 'days')
@@ -145,21 +145,21 @@ class DataScrollerMonth extends React.PureComponent {
         let DATE_RFC1128 = "ddd, DD MMM YYYY HH:mm:ss [GMT]";
         let newDate = moment.utc(this.state.date).subtract(1,'month').endOf('month').format("YYYY-MM-DD");
         let firstload = 0;
-        console.log("New Date when left button clicked "+newDate);
+        //console.log("New Date when left button clicked "+newDate);
         this.setState({fetching: true});
         let monthswitch = 0;
         let startdate = moment.utc(newDate).startOf('month');
         let enddate = moment.utc(newDate).endOf('month');
-        console.log("StartDate "+startdate.format("DMMYYYY"));
+        //console.log("StartDate "+startdate.format("DMMYYYY"));
         let www;
-        console.log("End date "+enddate.format("DMMYYYY")); 
-            AsyncStorage.getItem(moment.utc(startdate).format("DMMYYYY")).then((item)=>{
+        //console.log("End date "+enddate.format("DMMYYYY")); 
+            AsyncStorage.getItem(moment.utc(enddate).format("DMMYYYY")).then((item)=>{
                 if(item == null){
                     firstload=1;
-                    console.log("Start of month "+startdate.format("DDMMYYYY"));
-                    console.log("End of month "+enddate.format("DDMMYYYY"));
+                    //console.log("Start of month "+startdate.format("DDMMYYYY"));
+                    //console.log("End of month "+enddate.format("DDMMYYYY"));
                     let uri = 'http://118.185.27.157:5000/energygrid1?max_results=30000&where=_created>="'+startdate.startOf('month').format(DATE_RFC1128)+'" and _created<="'+startdate.endOf('month').format(DATE_RFC1128)+'"';
-                    console.log(uri);
+                    //console.log(uri);
                     fetch(uri)
                     .then(response => response.json())
                         .then((items) => {
@@ -170,7 +170,7 @@ class DataScrollerMonth extends React.PureComponent {
                             for(let j=1;j<=31;j++){
                                 mymap.set(j,[]);
                             }
-                            console.log("The length is "+items.length);
+                            //console.log("The length is "+items.length);
                             while(i<items.length){
                                 let key = parseInt(moment.utc(items[i]["_created"]).format("D"));
                                 mymap.set(key,[...mymap.get(key),items[i]]);
@@ -218,13 +218,13 @@ class DataScrollerMonth extends React.PureComponent {
         if(moment.utc(newDate).isAfter(moment.utc())){
             newDate =  moment.utc().format("YYYY-MM-DD");
         }
-        console.log("New Date when right button clicked "+newDate);
+        //console.log("New Date when right button clicked "+newDate);
         this.setState({fetching: true});
         let dateforpassing = moment.utc(newDate).startOf('month');
         let startdate = moment.utc(newDate).startOf('month');
         let enddate = moment.utc(newDate).endOf('month');
-        console.log("StartDate "+startdate.format("DMMYYYY"));
-        console.log("End date "+enddate.format("DMMYYYY")); 
+        //console.log("StartDate "+startdate.format("DMMYYYY"));
+        //console.log("End date "+enddate.format("DMMYYYY")); 
 
 
         let keyarr =[];

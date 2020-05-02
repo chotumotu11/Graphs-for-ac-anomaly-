@@ -22,16 +22,14 @@ class startapp extends React.PureComponent {
             loading: true,
             date: '2020-03-20'
         };
+
+        this.updatedb = this.updatedb.bind(this);
     }
 
 
-    componentDidMount(){
-        let DATE_RFC1128 = "ddd, DD MMM YYYY HH:mm:ss [GMT]"
-        let date  = moment.utc().format(DATE_RFC1128);
-        let startofmonth = moment.utc().startOf('month').format(DATE_RFC1128);
-        console.log(startofmonth);
+    updatedb(startofmonth,date){
         let uri = 'http://118.185.27.157:5000/energygrid1?max_results=30000&where=_created>="'+startofmonth+'" and _created<="'+date+'"'
-        console.log(uri);
+
         fetch(uri)
             .then(response => response.json())
                 .then((items) => {
@@ -41,7 +39,7 @@ class startapp extends React.PureComponent {
                     for(let j=1;j<=31;j++){
                         mymap.set(j,[]);
                     }
-                    console.log("The length is "+items.length);
+                    
                     while(i<items.length){
                         let key = parseInt(moment.utc(items[i]["Time_Stamp"]).format("D"));
                         mymap.set(key,[...mymap.get(key),items[i]]);
@@ -56,7 +54,17 @@ class startapp extends React.PureComponent {
                     //RNRestart.Restart();
                     this.setState({loading: false});
                 });
+    }
 
+    componentDidMount(){
+        let DATE_RFC1128 = "ddd, DD MMM YYYY HH:mm:ss [GMT]"
+        let date  = moment.utc().format(DATE_RFC1128);
+        let startofmonth = moment.utc().startOf('month').format(DATE_RFC1128);
+        
+        AsyncStorage.getItem("latestdate",(err,items)=>{
+            this.updatedb(startofmonth,date);
+        })
+        AsyncStorage.setItem("latestdate",JSON.stringify(date));
     }
     
     render() {

@@ -49,7 +49,7 @@ class DataScrollerDaily extends React.PureComponent {
             powermapnum.set(i,0);
         }
         let i=0;
-        console.log("Buga "+tempmapvalue.get(23));
+        
         while(i<items.length){
             let hour = parseInt(moment.utc(items[i]["_created"]).format("H"));
 
@@ -102,9 +102,9 @@ class DataScrollerDaily extends React.PureComponent {
             daily_humidity =  [...daily_humidity, newHumidity];
 
         }
-        console.log("Daily temp "+daily_temp);
-        console.log("Daily Humidity "+daily_humidity);
-        console.log("Daily power"+daily_power);
+        //console.log("Daily temp "+daily_temp);
+        //console.log("Daily Humidity "+daily_humidity);
+        //console.log("Daily power"+daily_power);
 
         this.setState({
             daily_temp: daily_temp,
@@ -118,19 +118,19 @@ class DataScrollerDaily extends React.PureComponent {
 
 
     getDailyData(){
-        console.log("Something 3");
+        
         let latestweekstart = moment.utc().startOf('day');
         let latestweekend = moment.utc().endOf('day');
         if(moment.utc(this.state.date).isSameOrAfter(latestweekstart) && moment.utc(this.state.date).isSameOrBefore(latestweekend)){
-            console.log("Something 2");
+            
             let DATE_RFC1128 = "ddd, DD MMM YYYY HH:mm:ss [GMT]";
             let start = moment.utc().startOf('day');
             let stop = moment.utc()
             let uri = 'http://118.185.27.157:5000/energygrid1?max_results=30000&where=_created>="'+start.format(DATE_RFC1128)+'" and _created<="'+stop.format(DATE_RFC1128)+'"';
-            console.log("Daily data "+uri);
+            
             fetch(uri).then(response => response.json())
                 .then(item => {
-                    console.log("Something 1");
+                    
                     item = item["_items"];
         
                     AsyncStorage.setItem(start.format("DMMYYYY"),JSON.stringify(item));
@@ -148,13 +148,13 @@ class DataScrollerDaily extends React.PureComponent {
         this.intervalID = setInterval(() => this.getDailyData(),120000);
         let DATE_RFC1128 = "ddd, DD MMM YYYY HH:mm:ss [GMT]";
         let datetocheck = this.state.date;
-        console.log("My data format "+datetocheck.format("DMMYYYY"));
+        
         AsyncStorage.getItem(datetocheck.format("DMMYYYY"),(err,items)=>{
-            //console.log("My items "+items);
+            
             if(items == null){
 
                 let weeklyuri = 'http://118.185.27.157:5000/energygrid1?max_results=30000&where=_created>="'+datetocheck.startOf('day').format(DATE_RFC1128)+'" and _created<="'+datetocheck.endOf('day').format(DATE_RFC1128)+'"';
-                console.log(weeklyuri);
+                
                 fetch(weeklyuri)
                     .then(response => response.json())
                     .then((items)=>{
@@ -173,15 +173,15 @@ class DataScrollerDaily extends React.PureComponent {
 
     onLeftButtonClick(){
         let newDate = moment.utc(this.state.date).subtract(1,'days');
-        console.log("New Date when left button clicked "+newDate.format("DDMMYYYY"));
+        //console.log("New Date when left button clicked "+newDate.format("DDMMYYYY"));
         this.setState({fetching: true});
         let DATE_RFC1128 = "ddd, DD MMM YYYY HH:mm:ss [GMT]";
         AsyncStorage.getItem(newDate.format("DMMYYYY"),(err,items)=>{
-            //console.log("My items "+items);
+            
             if(items == null){
 
                 let weeklyuri = 'http://118.185.27.157:5000/energygrid1?max_results=30000&where=_created>="'+newDate.startOf('day').format(DATE_RFC1128)+'" and _created<="'+newDate.endOf('day').format(DATE_RFC1128)+'"';
-                console.log(weeklyuri);
+                
                 fetch(weeklyuri)
                     .then(response => response.json())
                     .then((items)=>{
@@ -201,15 +201,15 @@ class DataScrollerDaily extends React.PureComponent {
         if(moment.utc(newDate).isAfter(moment.utc())){
             newDate =  moment.utc();
         }
-        console.log("New Date when right button clicked "+newDate.format("DDMMYYYY"));
+        //console.log("New Date when right button clicked "+newDate.format("DDMMYYYY"));
         this.setState({fetching: true});
         let DATE_RFC1128 = "ddd, DD MMM YYYY HH:mm:ss [GMT]";
         AsyncStorage.getItem(newDate.format("DMMYYYY"),(err,items)=>{
-            //console.log("My items "+items);
+            
             if(items == null){
 
                 let weeklyuri = 'http://118.185.27.157:5000/energygrid1?max_results=30000&where=_created>="'+newDate.startOf('day').format(DATE_RFC1128)+'" and _created<="'+newDate.endOf('day').format(DATE_RFC1128)+'"';
-                console.log(weeklyuri);
+                
                 fetch(weeklyuri)
                     .then(response => response.json())
                     .then((items)=>{

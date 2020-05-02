@@ -13,8 +13,8 @@ class MinMaxChartCustom extends React.PureComponent {
         const min = this.props.min.map((value) => ({ value }))
         const max = this.props.max.map((value) => ({ value }))
         const weeknum = Math.ceil(this.props.date.format("DD") / 7); 
-        console.log("Date Received "+this.props.date.format("DDMMYYYY"));
-        console.log("Weeknum "+weeknum);
+        //console.log("Date Received "+this.props.date.format("DDMMYYYY"));
+        //console.log("Weeknum "+weeknum);
         let conn;
         let startdate = moment.utc(this.props.date).startOf('week');
         let enddate = moment.utc(this.props.date).endOf('week');

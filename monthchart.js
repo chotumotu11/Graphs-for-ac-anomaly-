@@ -11,7 +11,7 @@ class MonthChart extends React.PureComponent {
 
     constructor(props){
         super();
-        console.log("Printing date in constrctor "+moment.utc(props.date).format("DDMMYYYY"));
+        //console.log("Printing date in constrctor "+moment.utc(props.date).format("DDMMYYYY"));
         this.state={
             monthDate :  props.date,
             today: moment.utc(),
@@ -100,6 +100,7 @@ class MonthChart extends React.PureComponent {
         let tempdate = [];
         let max=this.props.temp[0];
         let min=this.props.temp[0];
+        
         for(let i = 1;i<this.props.temp.length;i++){
             if(this.props.temp[i]==0){
                 continue;
@@ -112,12 +113,17 @@ class MonthChart extends React.PureComponent {
             }
         }
 
+        //console.log("Max "+max);
         for(let i = 0;i<this.props.temp.length;i++){
             if(this.props.temp[i]==0){
                 tempdate.push(0);
                 continue;
             }
-            tempdate.push(((this.props.temp[i] - min)/(max-min))*(29.5-0));
+            let num = ((this.props.temp[i] - min)/(max-min))*(29.5-0);
+            if(isNaN(num)){
+                num=29.5;
+            }
+            tempdate.push(num);
         }
 
         //console.log("Temp "+tempdate);
@@ -141,7 +147,11 @@ class MonthChart extends React.PureComponent {
                 circlepower.push(0);
                 continue;
             }
-            circlepower.push(((this.props.power[i] - min)/(max-min))*(29.5-0));
+            let num = ((this.props.power[i] - min)/(max-min))*(29.5-0);
+            if(isNaN(num)){
+                num=29.5;
+            }
+            circlepower.push(num);
         }
 
         //console.log("Power "+circlepower);
@@ -166,7 +176,11 @@ class MonthChart extends React.PureComponent {
                 circlehumidity.push(0);
                 continue;
             }
-            circlehumidity.push(((this.props.humidity[i] - min)/(max-min))*(29.5-0));
+            let num = ((this.props.humidity[i] - min)/(max-min))*(29.5-0);
+            if(isNaN(num)){
+                num=29.5;
+            }
+            circlehumidity.push(num);
         }
 
         //console.log("Humidity "+circlehumidity);
@@ -196,6 +210,11 @@ class MonthChart extends React.PureComponent {
             );
         }
 
+        //console.log("Selected day "+this.state.selected);
+        //console.log("power "+circlepower);
+        //console.log("temp "+tempdate);
+        //console.log("humdidity "+circlehumidity);
+
 
         let daysmonth = [];
         for(let i = 1; i<=this.daysInMonth();i++){
@@ -215,7 +234,7 @@ class MonthChart extends React.PureComponent {
                   fill='rgba(0,50,130,0.3)'
                   cx={size / 2}
                   cy={size / 2}
-                  r={this.state.selected == 0 ? circlepower[i-1] : this.state.selected == 1 ? tempdate[i-1] : circlehumidity[i-1]}
+                  r={this.state.selected == 0 ? circlepower[i-1] : (this.state.selected == 1 ? tempdate[i-1] : circlehumidity[i-1])}
                   
                 />
               </Svg>
